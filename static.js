@@ -57,7 +57,7 @@ function cacheFile(response, mtime, filename, notModified) {
                 exists: true,
                 content: data,
                 modified: mtime,
-                mime: mime.type("js"),
+                mime: mime.type(path.extname(filename)),
                 etag: hashed
             };
             outputFile(response, cache[filename], notModified);
@@ -108,7 +108,6 @@ function handleGet(request, response) {
 }
 
 http.createServer(function(request, response){
-    sys.log(JSON.stringify(request.headers));
     if (request.method == "OPTIONS") {
         sys.log("[ip] OPTIONS");
         response.writeHead(200, {
