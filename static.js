@@ -8,12 +8,12 @@ var path = require("path");
 var fs = require("fs");
 var sys = require("sys");
 var crypto = require("crypto");
+var mime = require("./mime").init();
 
 var cache = {};
 
 //TODO configure paths
 //TODO limit memory usage / evict from cache
-//TODO mime-types
 //TODO sane logging
 //TODO range header
 //TODO check if fs.watchFile could be useful
@@ -26,6 +26,7 @@ function outputFile(response, file, notModified) {
     } else {
         response.writeHead(file.exists ? 200 : 404, {
             "Content-Length": file.content.length,
+            "Content-Type": file.mime,
             "Last-Modified": file.modified.toUTCString(),
             "Etag": file.etag
         });
@@ -56,6 +57,7 @@ function cacheFile(response, mtime, filename, notModified) {
                 exists: true,
                 content: data,
                 modified: mtime,
+                mime: mime.type("js"),
                 etag: hashed
             };
             outputFile(response, cache[filename], notModified);
@@ -67,6 +69,7 @@ var notFoundFile = {
     exists: false,
     content: "",
     modified: new Date(0),
+    mime: "text/plain",
     etag: hash("")
 };
 
